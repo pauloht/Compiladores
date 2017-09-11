@@ -12,6 +12,7 @@ package compilador;
 public class Token {
     private Classificador classe = null;
     private Object valor = null;
+    String erroMsg;
     
     public Token(Classificador classe){
         this.classe = classe;
@@ -23,7 +24,15 @@ public class Token {
     }
     
     public void printSignificado(){
-        
+        String resp = classe.significado();
+        if (!(valor==null)){
+            resp = resp + ",valor : " + valor.toString();
+        }
+        System.out.println(resp);
+    }
+    
+    public void setMsg(String msg){
+        this.erroMsg = msg;
     }
     
     

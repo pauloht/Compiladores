@@ -75,6 +75,7 @@ public class NewJFrame extends javax.swing.JFrame {
             StringBuilder aux = new StringBuilder();
             boolean comentario = false;
             boolean breakPorComentario = false;
+            tokens = new ArrayList<>();
             //primeira parte ler arquivo e remover espacos e quebras de linha e comentarios
             while ((line = bufferedReader.readLine()) != null){
                 comentario = false;
@@ -136,7 +137,7 @@ public class NewJFrame extends javax.swing.JFrame {
                 for (int j=0;j<localString.length();j++){
                     char charLido = localString.charAt(j);
                     int valorASC = (int)charLido;
-                    if (charLido>=48&&charLido<=57){//lendo um numero
+                    if ((charLido>=48&&charLido<=57)||charLido=='.'){//lendo um numero
                         if (selfAcumulador||acumulamEmIgual){
                             String subDivisao = aux.toString();
                             novoSeparador.add(subDivisao);
@@ -232,33 +233,37 @@ public class NewJFrame extends javax.swing.JFrame {
             //
             aux.setLength(0);
             separador = novoSeparador;
-            /*
             System.out.println("segunda etapa : ");
             for (int i=0;i<separador.size();i++){
                 System.out.println(i+" : "+separador.get(i));
             }
-            */
             
             tokens = new ArrayList();
             for (int i=0;i<separador.size();i++){
                 String token = separador.get(i);
+                String msgErro = "";
                 Object valor = null;
                 Classificador classificador = Classificador.ERRO;
                 switch (token) {
                     case "+":
-                        classificador = Classificador.SOMA;
+                        classificador = Classificador.OP_ARITMETICA;
+                        valor = "+";
                         break;
                     case "-":
-                        classificador = Classificador.SUB;
+                        classificador = Classificador.OP_ARITMETICA;
+                        valor = "-";
                         break;
                     case "/":
-                        classificador = Classificador.DIV;
+                        classificador = Classificador.OP_ARITMETICA;
+                        valor = "/";
                         break;
                     case "*":
-                        classificador = Classificador.MUL;
+                        classificador = Classificador.OP_ARITMETICA;
+                        valor = "*";
                         break;
                     case "==" :
-                        classificador = Classificador.IGUALDADE;
+                        classificador = Classificador.OP_RELACIONAL;
+                        valor = "==";
                         break;
                     case "=" :
                         classificador = Classificador.ATRIBUICAO;
@@ -267,31 +272,39 @@ public class NewJFrame extends javax.swing.JFrame {
                         classificador = Classificador.PONTOVIRGULA;
                         break;
                     case "&&" :
-                        classificador = Classificador.AND;
+                        classificador = Classificador.OP_BOOLEAN_DUAL;
+                        valor = token;
                         break;
                     case "||" :
-                        classificador = Classificador.OR;
+                        classificador = Classificador.OP_BOOLEAN_DUAL;
+                        valor = token;
                         break;
                     case "!!" :
-                        classificador = Classificador.NOT;
+                        classificador = Classificador.OP_BOOLEAN_UNARIO;
                         break;
                     case "??" :
-                        classificador = Classificador.XOR;
+                        classificador = Classificador.OP_BOOLEAN_DUAL;
+                        valor = token;
                         break;
                     case "!=" :
-                        classificador = Classificador.DIFERENTEDE;
+                        classificador = Classificador.OP_RELACIONAL;
+                        valor = token;
                         break;
                     case ">" :
-                        classificador = Classificador.MAIOR;
+                        classificador = Classificador.OP_RELACIONAL;
+                        valor = token;
                         break;
                     case "<" :
-                        classificador = Classificador.MENOR;
+                        classificador = Classificador.OP_RELACIONAL;
+                        valor = token;
                         break;
                     case ">=" :
-                        classificador = Classificador.PONTOVIRGULA;
+                        classificador = Classificador.OP_RELACIONAL;
+                        valor = token;
                         break;
                     case "<=" :
-                        classificador = Classificador.PONTOVIRGULA;
+                        classificador = Classificador.OP_RELACIONAL;
+                        valor = token;
                         break;
                     case "false" :
                         classificador = Classificador.FALSE;
@@ -311,6 +324,30 @@ public class NewJFrame extends javax.swing.JFrame {
                     case "boolean" :
                         classificador = Classificador.BOOLEAN;
                         break;
+                    case "for" :
+                        classificador = Classificador.FOR;
+                        break;
+                    case "while" :
+                        classificador = Classificador.WHILE;
+                        break;
+                    case "if" :
+                        classificador = Classificador.IF;
+                        break;
+                    case "else" :
+                        classificador = Classificador.ELSE;
+                        break;
+                    case "(" :
+                        classificador = Classificador.ABREPARENTESES;
+                        break;
+                    case ")" :
+                        classificador = Classificador.FECHAPARENTESES;
+                        break;
+                    case "{" :
+                        classificador = Classificador.ABRECHAVES;
+                        break;
+                    case "}" :
+                        classificador = Classificador.FECHACHAVES;
+                        break;
                     default:
                         // ou é um nome ou é um numero inteiro ou é um numero real ou é uma string ou é um char
                         int tipo = 0; // tipo 0 = nao identificado tipo 1 = numero inteiro ou real tipo 2 = string tipo 3 = char tipo 4 = int tipo 5 = real tipo 6 = erro
@@ -321,7 +358,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                 classificador = Classificador.STRING;
                                 valor = token;
                             }else{
-                                classificador.setMsg("Erro String invalida!");
+                                msgErro = ("Erro String invalida!");
                             }
                         }else if (firstASC==39){// '
                             if (token.length()==3){
@@ -329,17 +366,17 @@ public class NewJFrame extends javax.swing.JFrame {
                                 if (ultimoToken == 39){
                                     classificador = Classificador.VCHAR;
                                 }else{
-                                    classificador.setMsg("Erro char invalido(não termina com ')");
+                                    msgErro = ("Erro char invalido(não termina com ')");
                                 }
                             }else if (token.length()==4){
                                 int ultimoToken = (int)token.charAt(3);
                                 if (token.charAt(1)=='\\'&&ultimoToken==39){
                                     classificador = classificador.VCHAR;
                                 }else{
-                                    classificador.setMsg("Erro char invalido");
+                                    msgErro = ("Erro char invalido");
                                 }
                             }else{
-                                classificador.setMsg("Erro char invalido!(tamanho 5?)");
+                                msgErro = ("Erro char invalido!(tamanho 5?)");
                             }
                         }else if (firstASC>=48&&firstASC<=57){
                             boolean encontrouPonto = false;
@@ -360,7 +397,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                 }
                             }
                             if (erro){
-                                classificador.setMsg("Erro combinação letra simbolo incorreta");
+                                msgErro = ("Erro combinação letra simbolo incorreta");
                             }else{
                                 if (encontrouPonto){
                                     classificador = Classificador.VDOUBLE;
@@ -369,7 +406,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                     }catch(NumberFormatException e){
                                         e.printStackTrace();
                                         classificador = Classificador.ERRO;
-                                        classificador.setMsg("Erro conversão double?");
+                                        msgErro = ("Erro conversão double?");
                                     }
                                 }else{
                                     classificador = Classificador.VINTEIRO;
@@ -378,7 +415,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                     }catch(NumberFormatException e){
                                         e.printStackTrace();
                                         classificador = Classificador.ERRO;
-                                        classificador.setMsg("Erro conversão inteiro?");
+                                        msgErro = ("Erro conversão inteiro?");
                                     }
                                 }
                             }
@@ -401,7 +438,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                 }
                             }
                             if (erro){
-                                classificador.setMsg("Erro combinação letra simbolo incorreta");
+                                msgErro = ("Erro combinação letra simbolo incorreta");
                             }else{
                                 if (encontrouPonto){
                                     classificador = Classificador.VDOUBLE;
@@ -410,7 +447,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                     }catch(NumberFormatException e){
                                         e.printStackTrace();
                                         classificador = Classificador.ERRO;
-                                        classificador.setMsg("Erro conversão double?");
+                                        msgErro = ("Erro conversão double?");
                                     }
                                 }else{
                                     classificador = Classificador.VINTEIRO;
@@ -419,17 +456,49 @@ public class NewJFrame extends javax.swing.JFrame {
                                     }catch(NumberFormatException e){
                                         e.printStackTrace();
                                         classificador = Classificador.ERRO;
-                                        classificador.setMsg("Erro conversão inteiro?");
+                                        msgErro = ("Erro conversão inteiro?");
                                     }
                                 }
                             }
                         }else{
-                            classificador.setMsg("Erro, inicio invalido? = '" + token + "'");
+                            //NOME
+                            //tem que comecar com letra e ser seguido de letras e numeros
+                            boolean valido = true;
+                            for (int j=0;j<token.length();j++){
+                                int valorASC = (int)token.charAt(j);
+                                if (j==0){
+                                    if ((valorASC>=65&&valorASC<=90) || (valorASC>=97&&valorASC<=122)){
+                                        
+                                    }else{
+                                        valido = false;
+                                        break;
+                                    }
+                                }else{
+                                    if ((valorASC>=65&&valorASC<=90) || (valorASC>=97&&valorASC<=122) || (valorASC>=48&&valorASC<=57)){
+                                        //valido
+                                    }else{
+                                        valido = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (valido){
+                                classificador = classificador.NOME;
+                                valor = token;
+                            }else{
+                                msgErro = ("Erro, inicio invalido? = '" + token + "'");
+                            }
                         }
                         break;
                 }
                 Token nTok = new Token(classificador,valor);
+                nTok.setMsg(msgErro);
                 tokens.add(nTok);
+                //System.out.println("para token : " + token);
+                //nTok.printSignificado();
+            }
+            for (Token t : tokens){
+                t.printSignificado();
             }
             bufferedReader.close();
         }catch(Exception e){
@@ -464,7 +533,7 @@ public class NewJFrame extends javax.swing.JFrame {
         {
             e.printStackTrace();
         }
-        System.out.println("end");
+        //System.out.println("end");
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

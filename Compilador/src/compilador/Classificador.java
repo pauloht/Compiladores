@@ -19,80 +19,47 @@ public enum Classificador {
     CHAR,//palavra reservada char
     BOOLEAN,//palavra reservada boolean
     STRING,
-    SOMA,
-    SUB,
-    DIV,
-    MUL,
-    IGUALDADE,
+    OP_ARITMETICA, // + * - /
+    OP_RELACIONAL, // == >= <= > < !=
+    OP_BOOLEAN_DUAL, // || && ??
+    OP_BOOLEAN_UNARIO, // !!
     ATRIBUICAO,
     PONTOVIRGULA,
-    AND,
-    OR,
-    NOT,
-    XOR,
-    DIFERENTEDE,
-    MAIOR,
-    MENOR,
-    MAIORIGUAL,
-    MENORIGUAL,
     TRUE,
     FALSE,
+    FOR,
+    WHILE,
+    ABREPARENTESES,
+    FECHAPARENTESES,
+    ABRECHAVES,
+    FECHACHAVES,
+    IF,
+    ELSE,
     ERRO;
-    
     private String msg;
-    
-    public void setMsg(String msg){
-        this.msg = msg;
-    }
     
     public String significado(){
         switch (this){
-            case AND :
-                return("AND");
             case ATRIBUICAO :
                 return("ATRIBUICAO");
             case BOOLEAN :
                 return("BOOLEAN");
             case CHAR :
                 return("CHAR");
-            case DIFERENTEDE :
-                return("DIFERENTE DE");
-            case DIV :
-                return("DIVISAO");
             case ERRO :
                 return("ERRO!="+msg);
             case FALSE :
                 return("FALSE");
-            case IGUALDADE :
-                return("IGUALDADE");
             case INT :
                 return("INT");
-            case MAIOR :
-                return("MAIOR QUE");
-            case MAIORIGUAL :
-                return("MAIOR IGUAL QUE");
-            case MENOR :
-                return("MENOR QUE");
-            case MENORIGUAL :
-                return("MENOR IGUAL QUE");
-            case MUL :
-                return ("MULTIPLICACAO");
             case NOME :
-                return("NOME");
-            case NOT :
-                return("NEGACAO");
-            case OR :
-                return("OR");
+                return("variavel");
             case PONTOVIRGULA :
                 return("PONTO E VIRGULA");
             case DOUBLE :
                 return("DOUBLE");
-            case SOMA :
-                return("SOMA");
             case STRING :
                 return("STRING");
-            case SUB :
-                return("SUB");
             case TRUE :
                 return("TRUE");
             case VCHAR :
@@ -101,8 +68,30 @@ public enum Classificador {
                 return("Valor inteiro");
             case VDOUBLE :
                 return("Valor double");
-            case XOR :
-                return("XOR");
+            case FOR : 
+                return("FOR");
+            case WHILE :
+                return("WHILE");
+            case OP_ARITMETICA :
+                return("Operacao Aritmetica");
+            case OP_BOOLEAN_DUAL :
+                return("Operação booleana dual");
+            case OP_BOOLEAN_UNARIO :
+                return("Operação booleana unaria");
+            case OP_RELACIONAL :
+                return("Operação relacional");
+            case ABRECHAVES :
+                return("Abre chaves");
+            case FECHACHAVES :
+                return("Fecha chaves");
+            case ABREPARENTESES :
+                return("Abre parenteses");
+            case FECHAPARENTESES :
+                return("Fecha paranteses");
+            case IF :
+                return("IF");
+            case ELSE :
+                return("ELSE");
             default :
                 return("DEFAULT");
         }
