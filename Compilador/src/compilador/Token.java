@@ -23,12 +23,16 @@ public class Token {
         this.valor = valor;
     }
     
-    public void printSignificado(){
+    public String printSignificado(){
         String resp = classe.significado();
-        if (!(valor==null)){
-            resp = resp + ",valor : " + valor.toString();
+        if (classe == Classificador.ERRO){
+            resp = "Erro em token : " + valor + ",erro : "+erroMsg;
+        }else{
+            if (!(valor==null)){
+                resp = resp + ",valor : " + valor.toString();
+            }
         }
-        System.out.println(resp);
+        return(resp);
     }
     
     public void setMsg(String msg){

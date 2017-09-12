@@ -5,6 +5,8 @@
  */
 package compilador;
 
+import javax.swing.JFrame;
+
 /**
  *
  * @author FREE
@@ -16,7 +18,9 @@ public class Compilador {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        
+        NewJFrame fr = new NewJFrame();
+        fr.setVisible(true);
+        fr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     
 }

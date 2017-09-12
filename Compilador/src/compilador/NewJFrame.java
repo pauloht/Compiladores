@@ -158,7 +158,7 @@ public class NewJFrame extends javax.swing.JFrame {
                         characterAcumulador = false;
                         aux.append(charLido);
                     }else{//simbolo especial
-                        if (charLido=='|'||charLido=='&'||charLido=='?'){//acumulam com si mesmo exemplo == && || ??
+                        if (charLido=='|'||charLido=='&'||charLido=='?'||charLido=='!'){//acumulam com si mesmo exemplo == && || ??
                             characterAcumulador = false;
                             acumulamEmIgual = false;
                             if (aux.length()>0){
@@ -193,7 +193,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                 characterAcumulador = true;
                                 selfAcumulador = false;
                                 aux.append(charLido);
-                            }else if (charLido=='>'||charLido=='!'||charLido=='<'||charLido=='='){//acumulam em igual exemplo >= != <= ==
+                            }else if (charLido=='>'||charLido=='~'||charLido=='<'||charLido=='='){//acumulam em igual exemplo >= != <= ==
                                 characterAcumulador = false;
                                 selfAcumulador = false;
                                 if (charLido=='='&&acumulamEmIgual){
@@ -213,13 +213,15 @@ public class NewJFrame extends javax.swing.JFrame {
                                 }
                             }else{//character separadores exemplo ; ) ( { } só fazem sentido sozinhos
                                 if (aux.length()>0){
-                                String subDivisao = aux.toString();
-                                novoSeparador.add(subDivisao);
-                                aux.setLength(0);
+                                    String subDivisao = aux.toString();
+                                    novoSeparador.add(subDivisao);
+                                    aux.setLength(0);
                                 }
                                 String opSeparador = ""+charLido;
                                 novoSeparador.add(opSeparador);
                                 characterAcumulador = false;
+                                selfAcumulador = false;
+                                acumulamEmIgual = false;
                             }
                         }
                     }
@@ -280,13 +282,13 @@ public class NewJFrame extends javax.swing.JFrame {
                         valor = token;
                         break;
                     case "!!" :
-                        classificador = Classificador.OP_BOOLEAN_UNARIO;
+                        classificador = Classificador.NEGACAO;
                         break;
                     case "??" :
                         classificador = Classificador.OP_BOOLEAN_DUAL;
                         valor = token;
                         break;
-                    case "!=" :
+                    case "~=" :
                         classificador = Classificador.OP_RELACIONAL;
                         valor = token;
                         break;
@@ -313,16 +315,20 @@ public class NewJFrame extends javax.swing.JFrame {
                         classificador = Classificador.TRUE;
                         break;
                     case "int" :
-                        classificador = Classificador.INT;
+                        classificador = Classificador.TIPO;
+                        valor = token;
                         break;
                     case "double" :
-                        classificador = Classificador.DOUBLE;
+                        classificador = Classificador.TIPO;
+                        valor = token;
                         break;
                     case "char" :
-                        classificador = Classificador.CHAR;
+                        classificador = Classificador.TIPO;
+                        valor = token;
                         break;
                     case "boolean" :
-                        classificador = Classificador.BOOLEAN;
+                        classificador = Classificador.TIPO;
+                        valor = token;
                         break;
                     case "for" :
                         classificador = Classificador.FOR;
@@ -349,6 +355,7 @@ public class NewJFrame extends javax.swing.JFrame {
                         classificador = Classificador.FECHACHAVES;
                         break;
                     default:
+                        valor = token;
                         // ou é um nome ou é um numero inteiro ou é um numero real ou é uma string ou é um char
                         int tipo = 0; // tipo 0 = nao identificado tipo 1 = numero inteiro ou real tipo 2 = string tipo 3 = char tipo 4 = int tipo 5 = real tipo 6 = erro
                         char firstChar = token.charAt(0);
@@ -358,7 +365,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                 classificador = Classificador.STRING;
                                 valor = token;
                             }else{
-                                msgErro = ("Erro String invalida!");
+                                msgErro = ("String invalida!");
                             }
                         }else if (firstASC==39){// '
                             if (token.length()==3){
@@ -366,38 +373,48 @@ public class NewJFrame extends javax.swing.JFrame {
                                 if (ultimoToken == 39){
                                     classificador = Classificador.VCHAR;
                                 }else{
-                                    msgErro = ("Erro char invalido(não termina com ')");
+                                    msgErro = ("char invalido(não termina com ')");
                                 }
                             }else if (token.length()==4){
                                 int ultimoToken = (int)token.charAt(3);
                                 if (token.charAt(1)=='\\'&&ultimoToken==39){
                                     classificador = classificador.VCHAR;
                                 }else{
-                                    msgErro = ("Erro char invalido");
+                                    msgErro = ("char invalido");
                                 }
                             }else{
-                                msgErro = ("Erro char invalido!(tamanho 5?)");
+                                msgErro = ("char invalido!(tamanho 5?)");
                             }
                         }else if (firstASC>=48&&firstASC<=57){
                             boolean encontrouPonto = false;
                             boolean erro = false;
+                            aux.setLength(0);
+                            String errorMsg = "";
                             for (int j=1;j<token.length();j++){
                                 char charLido = token.charAt(j);
                                 int valorASC = (int)charLido;
                                 if (charLido=='.'){
                                     if (encontrouPonto){
                                         erro = true;
+                                        errorMsg = "Número com dois '.'!";
                                         break;
                                     }else{
                                         encontrouPonto = true;
                                     }
                                 }else if (valorASC<48||valorASC>57){
                                     erro = true;
+                                    aux.append(charLido);
+                                    if (((valorASC>=65&&valorASC<=90) || (valorASC>=97&&valorASC<=122))){
+                                        errorMsg = "Número com caracter inválido " + aux.toString()+", ou variavel que começa com numero";
+                                    }else{
+                                        errorMsg = "Número com caracter inválido " + aux.toString();
+                                    }
+                                    aux.setLength(0);
                                     break;
                                 }
                             }
                             if (erro){
-                                msgErro = ("Erro combinação letra simbolo incorreta");
+                                msgErro = errorMsg;
                             }else{
                                 if (encontrouPonto){
                                     classificador = Classificador.VDOUBLE;
@@ -420,73 +437,124 @@ public class NewJFrame extends javax.swing.JFrame {
                                 }
                             }
                         }else if (firstChar=='+'||firstChar=='-'){
-                            boolean encontrouPonto = false;
-                            boolean erro = false;
-                            for (int j=1;j<token.length();j++){
-                                char charLido = token.charAt(j);
-                                int valorASC = (int)charLido;
-                                if (charLido=='.'){
-                                    if (encontrouPonto){
+                            char segundoChar = token.charAt(1);
+                            int segundoASC = (int)segundoChar;
+                            if (segundoASC>=48&&segundoASC<=57){
+                                boolean encontrouPonto = false;
+                                boolean erro = false;
+                                String errorMsg = "";
+                                aux.setLength(0);
+                                for (int j=1;j<token.length();j++){
+                                    char charLido = token.charAt(j);
+                                    int valorASC = (int)charLido;
+                                    if (charLido=='.'){
+                                        if (encontrouPonto){
+                                            erro = true;
+                                            errorMsg = "Número com dois '.'!";
+                                            break;
+                                        }else{
+                                            encontrouPonto = true;
+                                        }
+                                    }else if (valorASC<48||valorASC>57){
                                         erro = true;
+                                        aux.append(charLido);
+                                        if (((valorASC>=65&&valorASC<=90) || (valorASC>=97&&valorASC<=122))){
+                                        errorMsg = "Número com caracter inválido " + aux.toString()+", ou variavel que começa com numero";
+                                        }else{
+                                            errorMsg = "Número com caracter inválido " + aux.toString();
+                                        }
+                                        aux.setLength(0);
                                         break;
-                                    }else{
-                                        encontrouPonto = true;
                                     }
-                                }else if (valorASC<48||valorASC>57){
-                                    erro = true;
-                                    break;
                                 }
-                            }
-                            if (erro){
-                                msgErro = ("Erro combinação letra simbolo incorreta");
-                            }else{
-                                if (encontrouPonto){
-                                    classificador = Classificador.VDOUBLE;
-                                    try{
-                                    valor = Double.parseDouble(token);
-                                    }catch(NumberFormatException e){
-                                        e.printStackTrace();
-                                        classificador = Classificador.ERRO;
-                                        msgErro = ("Erro conversão double?");
-                                    }
+                                if (erro){
+                                    msgErro = errorMsg;
                                 }else{
-                                    classificador = Classificador.VINTEIRO;
-                                    try{
-                                    valor = Integer.parseInt(token);
-                                    }catch(NumberFormatException e){
-                                        e.printStackTrace();
-                                        classificador = Classificador.ERRO;
-                                        msgErro = ("Erro conversão inteiro?");
+                                    if (encontrouPonto){
+                                        classificador = Classificador.VDOUBLE;
+                                        try{
+                                        valor = Double.parseDouble(token);
+                                        }catch(NumberFormatException e){
+                                            e.printStackTrace();
+                                            classificador = Classificador.ERRO;
+                                            msgErro = ("Erro conversão double?");
+                                        }
+                                    }else{
+                                        classificador = Classificador.VINTEIRO;
+                                        try{
+                                        valor = Integer.parseInt(token);
+                                        }catch(NumberFormatException e){
+                                            e.printStackTrace();
+                                            classificador = Classificador.ERRO;
+                                            msgErro = ("Erro conversão inteiro?");
+                                        }
                                     }
                                 }
+                            }else{
+                                msgErro = ("Erro de representação de número começando com '+/-' seguido de '.',use um NUMERO depois de '+/-', Ex : +0.5 -1.7");
                             }
                         }else{
                             //NOME
                             //tem que comecar com letra e ser seguido de letras e numeros
                             boolean valido = true;
+                            char charInvalidoBuffer = ' ';
+                            int indicadorDeErro = 0;//0 sem erro 1 - variavel que começa com numero 2-simbolo ilegal
+                            char erroBuffer = ' ';
+                            int bufferDePosicao = 0;
                             for (int j=0;j<token.length();j++){
+                                char charLido = token.charAt(j);
                                 int valorASC = (int)token.charAt(j);
                                 if (j==0){
                                     if ((valorASC>=65&&valorASC<=90) || (valorASC>=97&&valorASC<=122)){
                                         
                                     }else{
+                                        if (valorASC>=48&&valorASC<=57){
+                                            indicadorDeErro = 1;
+                                        }else{
+                                            indicadorDeErro = 2;
+                                        }
+                                        bufferDePosicao = i;
+                                        erroBuffer = charLido;
                                         valido = false;
+                                        charInvalidoBuffer = charLido;
                                         break;
                                     }
                                 }else{
                                     if ((valorASC>=65&&valorASC<=90) || (valorASC>=97&&valorASC<=122) || (valorASC>=48&&valorASC<=57)){
                                         //valido
                                     }else{
+                                        bufferDePosicao = i;
+                                        indicadorDeErro = 2;
+                                        erroBuffer = charLido;
                                         valido = false;
+                                        charInvalidoBuffer = charLido;
                                         break;
                                     }
                                 }
                             }
                             if (valido){
-                                classificador = classificador.NOME;
+                                classificador = classificador.ID;
                                 valor = token;
                             }else{
-                                msgErro = ("Erro, inicio invalido? = '" + token + "'");
+                                String errorMsg;
+                                switch (indicadorDeErro) {
+                                    case 1:
+                                        errorMsg = "Variável não pode começar com número!";
+                                        break;
+                                    case 2:
+                                        StringBuilder sb = new StringBuilder();
+                                        if (erroBuffer=='.'){
+                                            System.out.println("Numero não pode começar com '.'");
+                                        }else{
+                                            sb.append("Simbolo ilegal : '").append(erroBuffer).append("'");
+                                        }
+                                        errorMsg = sb.toString();
+                                        break;
+                                    default:
+                                        errorMsg = "erro nao catalogado?";
+                                        break;
+                                }
+                                msgErro = errorMsg;
                             }
                         }
                         break;
@@ -497,8 +565,8 @@ public class NewJFrame extends javax.swing.JFrame {
                 //System.out.println("para token : " + token);
                 //nTok.printSignificado();
             }
-            for (Token t : tokens){
-                t.printSignificado();
+            for (int i=0;i<tokens.size();i++){
+                System.out.println("token id : " + i + " -> " + tokens.get(i).printSignificado());
             }
             bufferedReader.close();
         }catch(Exception e){

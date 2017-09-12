@@ -1,0 +1,3 @@
+nome=10 &&!!??|| +-*/= //random comentario
+
+==~=>=<=>< === if else while for int double boolean char true false

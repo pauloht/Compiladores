@@ -13,16 +13,13 @@ public enum Classificador {
     VINTEIRO,//valor inteiro
     VDOUBLE,//valor real 
     VCHAR,//valor char
-    NOME,
-    INT,//palavra reservada int
-    DOUBLE,//palavra reservada double
-    CHAR,//palavra reservada char
-    BOOLEAN,//palavra reservada boolean
+    ID,
     STRING,
     OP_ARITMETICA, // + * - /
     OP_RELACIONAL, // == >= <= > < !=
     OP_BOOLEAN_DUAL, // || && ??
-    OP_BOOLEAN_UNARIO, // !!
+    NEGACAO, // !!
+    TIPO,
     ATRIBUICAO,
     PONTOVIRGULA,
     TRUE,
@@ -36,62 +33,55 @@ public enum Classificador {
     IF,
     ELSE,
     ERRO;
-    private String msg;
     
     public String significado(){
         switch (this){
             case ATRIBUICAO :
-                return("ATRIBUICAO");
-            case BOOLEAN :
-                return("BOOLEAN");
-            case CHAR :
-                return("CHAR");
+                return("=");
             case ERRO :
-                return("ERRO!="+msg);
+                return("ERRO");
             case FALSE :
-                return("FALSE");
-            case INT :
-                return("INT");
-            case NOME :
-                return("variavel");
+                return("Palavra reservada 'false'");
+            case ID :
+                return("id");
             case PONTOVIRGULA :
-                return("PONTO E VIRGULA");
-            case DOUBLE :
-                return("DOUBLE");
+                return(";");
             case STRING :
-                return("STRING");
+                return("String ");
             case TRUE :
-                return("TRUE");
+                return("Palavra reservada 'true'");
             case VCHAR :
-                return("Valor char");
+                return("Caracter");
             case VINTEIRO :
-                return("Valor inteiro");
+                return("Inteiro");
             case VDOUBLE :
-                return("Valor double");
+                return("Double");
             case FOR : 
-                return("FOR");
+                return("palavra reservada 'for'");
             case WHILE :
-                return("WHILE");
+                return("palavra reservada 'while'");
             case OP_ARITMETICA :
                 return("Operacao Aritmetica");
             case OP_BOOLEAN_DUAL :
-                return("Operação booleana dual");
-            case OP_BOOLEAN_UNARIO :
-                return("Operação booleana unaria");
+                return("Operação booleana de dois operandos : ");
+            case NEGACAO :
+                return("Operação de negacao '!!'");
             case OP_RELACIONAL :
                 return("Operação relacional");
             case ABRECHAVES :
-                return("Abre chaves");
+                return("{");
             case FECHACHAVES :
-                return("Fecha chaves");
+                return("}");
             case ABREPARENTESES :
-                return("Abre parenteses");
+                return("(");
             case FECHAPARENTESES :
-                return("Fecha paranteses");
+                return(")");
             case IF :
-                return("IF");
+                return("Palavra reservada 'if'");
             case ELSE :
-                return("ELSE");
+                return("Palavra reservada 'else'");
+            case TIPO :
+                return("Tipo");
             default :
                 return("DEFAULT");
         }

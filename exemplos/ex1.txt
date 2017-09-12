@@ -1,0 +1,2 @@
+for int i boolean a 
+x = y z=2 3.5632 -2345.21;double r
