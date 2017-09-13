@@ -148,7 +148,7 @@ public class NewJFrame extends javax.swing.JFrame {
                         characterAcumulador = false;
                         aux.append(charLido);
                     }else if ((charLido>=65&&charLido<=90) || (charLido>=97&&charLido<=122)){//lendo uma letra de A-z
-                        if (characterAcumulador || selfAcumulador){
+                        if (characterAcumulador || selfAcumulador || acumulamEmIgual){
                             String subDivisao = aux.toString();
                             novoSeparador.add(subDivisao);
                             aux.setLength(0);
@@ -235,10 +235,12 @@ public class NewJFrame extends javax.swing.JFrame {
             //
             aux.setLength(0);
             separador = novoSeparador;
+            /*
             System.out.println("segunda etapa : ");
             for (int i=0;i<separador.size();i++){
                 System.out.println(i+" : "+separador.get(i));
             }
+            */
             
             tokens = new ArrayList();
             for (int i=0;i<separador.size();i++){
