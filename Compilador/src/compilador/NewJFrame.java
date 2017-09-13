@@ -418,23 +418,28 @@ public class NewJFrame extends javax.swing.JFrame {
                             if (erro){
                                 msgErro = errorMsg;
                             }else{
-                                if (encontrouPonto){
-                                    classificador = Classificador.VDOUBLE;
-                                    try{
-                                    valor = Double.parseDouble(token);
-                                    }catch(NumberFormatException e){
-                                        e.printStackTrace();
-                                        classificador = Classificador.ERRO;
-                                        msgErro = ("Erro conversão double?");
-                                    }
+                                char ultimoChar = token.charAt(token.length()-1);
+                                if (ultimoChar=='.'){
+                                    msgErro = "Número não pode terminar em '.'";
                                 }else{
-                                    classificador = Classificador.VINTEIRO;
-                                    try{
-                                    valor = Integer.parseInt(token);
-                                    }catch(NumberFormatException e){
-                                        e.printStackTrace();
-                                        classificador = Classificador.ERRO;
-                                        msgErro = ("Erro conversão inteiro?");
+                                    if (encontrouPonto){
+                                        classificador = Classificador.VDOUBLE;
+                                        try{
+                                        valor = Double.parseDouble(token);
+                                        }catch(NumberFormatException e){
+                                            e.printStackTrace();
+                                            classificador = Classificador.ERRO;
+                                            msgErro = ("Erro conversão double?");
+                                        }
+                                    }else{
+                                        classificador = Classificador.VINTEIRO;
+                                        try{
+                                        valor = Integer.parseInt(token);
+                                        }catch(NumberFormatException e){
+                                            e.printStackTrace();
+                                            classificador = Classificador.ERRO;
+                                            msgErro = ("Erro conversão inteiro?");
+                                        }
                                     }
                                 }
                             }
@@ -472,23 +477,28 @@ public class NewJFrame extends javax.swing.JFrame {
                                 if (erro){
                                     msgErro = errorMsg;
                                 }else{
-                                    if (encontrouPonto){
-                                        classificador = Classificador.VDOUBLE;
-                                        try{
-                                        valor = Double.parseDouble(token);
-                                        }catch(NumberFormatException e){
-                                            e.printStackTrace();
-                                            classificador = Classificador.ERRO;
-                                            msgErro = ("Erro conversão double?");
-                                        }
+                                    char ultimoChar = token.charAt(token.length()-1);
+                                    if (ultimoChar=='.'){
+                                        msgErro = "Número não pode terminar em '.'";
                                     }else{
-                                        classificador = Classificador.VINTEIRO;
-                                        try{
-                                        valor = Integer.parseInt(token);
-                                        }catch(NumberFormatException e){
-                                            e.printStackTrace();
-                                            classificador = Classificador.ERRO;
-                                            msgErro = ("Erro conversão inteiro?");
+                                        if (encontrouPonto){
+                                            classificador = Classificador.VDOUBLE;
+                                            try{
+                                            valor = Double.parseDouble(token);
+                                            }catch(NumberFormatException e){
+                                                e.printStackTrace();
+                                                classificador = Classificador.ERRO;
+                                                msgErro = ("Erro conversão double?");
+                                            }
+                                        }else{
+                                            classificador = Classificador.VINTEIRO;
+                                            try{
+                                            valor = Integer.parseInt(token);
+                                            }catch(NumberFormatException e){
+                                                e.printStackTrace();
+                                                classificador = Classificador.ERRO;
+                                                msgErro = ("Erro conversão inteiro?");
+                                            }
                                         }
                                     }
                                 }
@@ -546,7 +556,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                     case 2:
                                         StringBuilder sb = new StringBuilder();
                                         if (erroBuffer=='.'){
-                                            System.out.println("Numero não pode começar com '.'");
+                                            sb.append("Numero não pode começar com '.'");
                                         }else{
                                             sb.append("Simbolo ilegal : '").append(erroBuffer).append("'");
                                         }
