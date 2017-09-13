@@ -129,6 +129,8 @@ public class NewJFrame extends javax.swing.JFrame {
             boolean characterAcumulador = false;
             boolean selfAcumulador = false;
             boolean acumulamEmIgual = false;
+            boolean abriuAspasDuplas = false;
+            boolean abriuAspasSimples = false;
             for (int i=0;i<separador.size();i++){
                 characterAcumulador = false;
                 selfAcumulador = false;
@@ -137,91 +139,145 @@ public class NewJFrame extends javax.swing.JFrame {
                 for (int j=0;j<localString.length();j++){
                     char charLido = localString.charAt(j);
                     int valorASC = (int)charLido;
-                    if ((charLido>=48&&charLido<=57)||charLido=='.'){//lendo um numero
-                        if (selfAcumulador||acumulamEmIgual){
-                            String subDivisao = aux.toString();
-                            novoSeparador.add(subDivisao);
-                            aux.setLength(0);
-                        }
-                        selfAcumulador = false;
-                        acumulamEmIgual = false;
-                        characterAcumulador = false;
-                        aux.append(charLido);
-                    }else if ((charLido>=65&&charLido<=90) || (charLido>=97&&charLido<=122)){//lendo uma letra de A-z
-                        if (characterAcumulador || selfAcumulador || acumulamEmIgual){
-                            String subDivisao = aux.toString();
-                            novoSeparador.add(subDivisao);
-                            aux.setLength(0);
-                        }
-                        selfAcumulador = false;
-                        acumulamEmIgual = false;
-                        characterAcumulador = false;
-                        aux.append(charLido);
-                    }else{//simbolo especial
-                        if (charLido=='|'||charLido=='&'||charLido=='?'||charLido=='!'){//acumulam com si mesmo exemplo == && || ??
+                    if (charLido=='"'){
+                        if (abriuAspasSimples){
+                            aux.append('"');
+                        }else{
+                            selfAcumulador = false;
                             characterAcumulador = false;
                             acumulamEmIgual = false;
-                            if (aux.length()>0){
-                                if (aux.charAt(0)==charLido){
-                                    //System.out.println(aux.charAt(0) + " == " + charLido);
-                                    aux.append(charLido);
-                                    String subDivisao = aux.toString();
-                                    novoSeparador.add(subDivisao);
-                                    aux.setLength(0);
-                                    selfAcumulador = false;
-                                }else{
-                                    //System.out.println(aux.charAt(0) + " != " + charLido);
-                                    String subDivisao = aux.toString();
-                                    novoSeparador.add(subDivisao);
-                                    aux.setLength(0);
-                                    
-                                    aux.append(charLido);
-                                    selfAcumulador = true;
-                                }
+                            if (abriuAspasDuplas){
+                                abriuAspasDuplas = false;
+                                aux.append('"');
+                                String subDivisao = aux.toString();
+                                novoSeparador.add(subDivisao);
+                                aux.setLength(0);
                             }else{
-                                selfAcumulador = true;
-                                aux.append(charLido);
-                            }
-                        }else{
-                            if (charLido=='+'||charLido=='-'){ //acumuladores com valores exemplo +5 -4
+                                abriuAspasDuplas = true;
                                 if (aux.length()>0){
+                                    String subDivisao = aux.toString();
+                                    novoSeparador.add(subDivisao);
+                                    aux.setLength(0);
+                                }
+                                aux.append('"');
+                            }
+                        }
+                    }else{
+                        if (abriuAspasDuplas){
+                                aux.append(charLido);
+                        }else{
+                            if (valorASC == 39){
+                                selfAcumulador = false;
+                                characterAcumulador = false;
+                                acumulamEmIgual = false;
+                                if (abriuAspasSimples){
+                                    abriuAspasSimples = false;
+                                    aux.append(charLido);
+                                    String subDivisao = aux.toString();
+                                    novoSeparador.add(subDivisao);
+                                    aux.setLength(0);
+                                }else{
+                                    abriuAspasSimples = true;
+                                    if (aux.length()>0){
                                         String subDivisao = aux.toString();
                                         novoSeparador.add(subDivisao);
                                         aux.setLength(0);
-                                }
-                                acumulamEmIgual = false;
-                                characterAcumulador = true;
-                                selfAcumulador = false;
-                                aux.append(charLido);
-                            }else if (charLido=='>'||charLido=='~'||charLido=='<'||charLido=='='){//acumulam em igual exemplo >= != <= ==
-                                characterAcumulador = false;
-                                selfAcumulador = false;
-                                if (charLido=='='&&acumulamEmIgual){
-                                    acumulamEmIgual = false;
-                                    aux.append(charLido);
-                                    String subDivisao = aux.toString();
-                                    novoSeparador.add(subDivisao);
-                                    aux.setLength(0);
-                                }else{
-                                    acumulamEmIgual = true;
-                                    if (aux.length()>0){
-                                            String subDivisao = aux.toString();
-                                            novoSeparador.add(subDivisao);
-                                            aux.setLength(0);
                                     }
                                     aux.append(charLido);
                                 }
-                            }else{//character separadores exemplo ; ) ( { } só fazem sentido sozinhos
-                                if (aux.length()>0){
-                                    String subDivisao = aux.toString();
-                                    novoSeparador.add(subDivisao);
-                                    aux.setLength(0);
+                            }else{
+                                if (abriuAspasSimples){
+                                    aux.append(charLido);
+                                }else{
+                                    if ((charLido>=48&&charLido<=57)||charLido=='.'){//lendo um numero
+                                        if (selfAcumulador||acumulamEmIgual){
+                                            String subDivisao = aux.toString();
+                                            novoSeparador.add(subDivisao);
+                                            aux.setLength(0);
+                                        }
+                                        selfAcumulador = false;
+                                        acumulamEmIgual = false;
+                                        characterAcumulador = false;
+                                        aux.append(charLido);
+                                    }else if ((charLido>=65&&charLido<=90) || (charLido>=97&&charLido<=122) ||  (charLido=='"')){//lendo uma letra de A-z
+                                        if (characterAcumulador || selfAcumulador || acumulamEmIgual){
+                                            String subDivisao = aux.toString();
+                                            novoSeparador.add(subDivisao);
+                                            aux.setLength(0);
+                                        }
+                                        selfAcumulador = false;
+                                        acumulamEmIgual = false;
+                                        characterAcumulador = false;
+                                        aux.append(charLido);
+                                    }else{//simbolo especial
+                                        if (charLido=='|'||charLido=='&'||charLido=='?'||charLido=='!'){//acumulam com si mesmo exemplo == && || ??
+                                            characterAcumulador = false;
+                                            acumulamEmIgual = false;
+                                            if (aux.length()>0){
+                                                if (aux.charAt(0)==charLido){
+                                                    //System.out.println(aux.charAt(0) + " == " + charLido);
+                                                    aux.append(charLido);
+                                                    String subDivisao = aux.toString();
+                                                    novoSeparador.add(subDivisao);
+                                                    aux.setLength(0);
+                                                    selfAcumulador = false;
+                                                }else{
+                                                    //System.out.println(aux.charAt(0) + " != " + charLido);
+                                                    String subDivisao = aux.toString();
+                                                    novoSeparador.add(subDivisao);
+                                                    aux.setLength(0);
+
+                                                    aux.append(charLido);
+                                                    selfAcumulador = true;
+                                                }
+                                            }else{
+                                                selfAcumulador = true;
+                                                aux.append(charLido);
+                                            }
+                                        }else{
+                                            if (charLido=='+'||charLido=='-'){ //acumuladores com valores exemplo +5 -4
+                                                if (aux.length()>0){
+                                                        String subDivisao = aux.toString();
+                                                        novoSeparador.add(subDivisao);
+                                                        aux.setLength(0);
+                                                }
+                                                acumulamEmIgual = false;
+                                                characterAcumulador = true;
+                                                selfAcumulador = false;
+                                                aux.append(charLido);
+                                            }else if (charLido=='>'||charLido=='~'||charLido=='<'||charLido=='='){//acumulam em igual exemplo >= != <= ==
+                                                characterAcumulador = false;
+                                                selfAcumulador = false;
+                                                if (charLido=='='&&acumulamEmIgual){
+                                                    acumulamEmIgual = false;
+                                                    aux.append(charLido);
+                                                    String subDivisao = aux.toString();
+                                                    novoSeparador.add(subDivisao);
+                                                    aux.setLength(0);
+                                                }else{
+                                                    acumulamEmIgual = true;
+                                                    if (aux.length()>0){
+                                                            String subDivisao = aux.toString();
+                                                            novoSeparador.add(subDivisao);
+                                                            aux.setLength(0);
+                                                    }
+                                                    aux.append(charLido);
+                                                }
+                                            }else{//character separadores exemplo ; ) ( { } só fazem sentido sozinhos
+                                                if (aux.length()>0){
+                                                    String subDivisao = aux.toString();
+                                                    novoSeparador.add(subDivisao);
+                                                    aux.setLength(0);
+                                                }
+                                                String opSeparador = ""+charLido;
+                                                novoSeparador.add(opSeparador);
+                                                characterAcumulador = false;
+                                                selfAcumulador = false;
+                                                acumulamEmIgual = false;
+                                            }
+                                        }
+                                    }
                                 }
-                                String opSeparador = ""+charLido;
-                                novoSeparador.add(opSeparador);
-                                characterAcumulador = false;
-                                selfAcumulador = false;
-                                acumulamEmIgual = false;
                             }
                         }
                     }
@@ -356,6 +412,9 @@ public class NewJFrame extends javax.swing.JFrame {
                     case "}" :
                         classificador = Classificador.FECHACHAVES;
                         break;
+                    case "start" :
+                        classificador = Classificador.START;
+                        break;
                     default:
                         valor = token;
                         // ou é um nome ou é um numero inteiro ou é um numero real ou é uma string ou é um char
@@ -364,8 +423,29 @@ public class NewJFrame extends javax.swing.JFrame {
                         int firstASC = (int)firstChar;
                         if (firstChar=='"'){
                             if (token.charAt(token.length()-1)=='"'){
-                                classificador = Classificador.STRING;
-                                valor = token;
+                                boolean characterInvalido = false;
+                                StringBuilder characterInvalidoBuffer = new StringBuilder();
+                                for (int k=1;k<token.length()-1;k++){
+                                    char charLido = token.charAt(k);
+                                    int valorASC = (int)charLido;
+                                    if ((valorASC>=48&&valorASC<=57)||(valorASC>=65&&valorASC<=90) || (valorASC>=97&&valorASC<=122)){
+                                        
+                                    }else{
+                                        characterInvalidoBuffer.append(charLido);
+                                        characterInvalido = true;
+                                        break;
+                                    }
+                                }
+                                if (characterInvalido || token.length()<2){
+                                    if (token.length()<2){
+                                        msgErro = "String tem que ter no minimo 3 de tamanho!";
+                                    }else{
+                                        msgErro = "caracter Invalido em string : ' " + characterInvalidoBuffer + " '";
+                                    }
+                                }else{
+                                    classificador = Classificador.STRING;
+                                    valor = token;
+                                }
                             }else{
                                 msgErro = ("String invalida!");
                             }
@@ -373,19 +453,35 @@ public class NewJFrame extends javax.swing.JFrame {
                             if (token.length()==3){
                                 int ultimoToken = (int)token.charAt(2);
                                 if (ultimoToken == 39){
-                                    classificador = Classificador.VCHAR;
+                                    boolean characterInvalido = false;
+                                    StringBuilder characterInvalidoBuffer = new StringBuilder();
+                                    for (int k=1;k<token.length()-1;k++){
+                                        char charLido = token.charAt(k);
+                                        int valorASC = (int)charLido;
+                                        if ((valorASC>=48&&valorASC<=57)||(valorASC>=65&&valorASC<=90) || (valorASC>=97&&valorASC<=122)){
+
+                                        }else{
+                                            characterInvalidoBuffer.append(charLido);
+                                            characterInvalido = true;
+                                            break;
+                                        }
+                                    }
+                                    if (characterInvalido){
+                                        msgErro = "caracter Invalido em char : ' " + characterInvalidoBuffer + " '";
+                                    }else{
+                                        classificador = Classificador.VCHAR;
+                                        valor = token.charAt(1);
+                                    }
                                 }else{
                                     msgErro = ("char invalido(não termina com ')");
                                 }
-                            }else if (token.length()==4){
-                                int ultimoToken = (int)token.charAt(3);
-                                if (token.charAt(1)=='\\'&&ultimoToken==39){
-                                    classificador = classificador.VCHAR;
-                                }else{
-                                    msgErro = ("char invalido");
-                                }
                             }else{
-                                msgErro = ("char invalido!(tamanho 5?)");
+                                int ultimoToken = (int)token.charAt(token.length()-1);
+                                if (ultimoToken==39){
+                                    msgErro = "char invalido!(tamanho maior que 1)";
+                                }else{
+                                    msgErro = "' não foi fechado";
+                                }
                             }
                         }else if (firstASC>=48&&firstASC<=57){
                             boolean encontrouPonto = false;

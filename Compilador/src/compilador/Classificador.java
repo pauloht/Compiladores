@@ -30,6 +30,7 @@ public enum Classificador {
     FECHAPARENTESES,
     ABRECHAVES,
     FECHACHAVES,
+    START,
     IF,
     ELSE,
     ERRO;
@@ -82,6 +83,8 @@ public enum Classificador {
                 return("Palavra reservada 'else'");
             case TIPO :
                 return("Tipo");
+            case START :
+                return("Palavra reservada 'start'");
             default :
                 return("DEFAULT");
         }
