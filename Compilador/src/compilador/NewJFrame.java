@@ -69,6 +69,7 @@ public class NewJFrame extends javax.swing.JFrame {
     private void gerarSeparadores(File file){
         String line = null;
         separador = new ArrayList<>();
+        boolean errorIndicator = false;
         try{
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -297,7 +298,6 @@ public class NewJFrame extends javax.swing.JFrame {
                 System.out.println(i+" : "+separador.get(i));
             }
             */
-            
             tokens = new ArrayList();
             for (int i=0;i<separador.size();i++){
                 String token = separador.get(i);
@@ -394,8 +394,14 @@ public class NewJFrame extends javax.swing.JFrame {
                     case "while" :
                         classificador = Classificador.WHILE;
                         break;
+                    case "," :
+                        classificador = Classificador.VIRGULA;
+                        break;
                     case "if" :
                         classificador = Classificador.IF;
+                        break;
+                    case "print" :
+                        classificador = Classificador.PRINT;
                         break;
                     case "else" :
                         classificador = Classificador.ELSE;
@@ -439,8 +445,10 @@ public class NewJFrame extends javax.swing.JFrame {
                                 if (characterInvalido || token.length()<2){
                                     if (token.length()<2){
                                         msgErro = "String tem que ter no minimo 3 de tamanho!";
+                                        errorIndicator = true;
                                     }else{
                                         msgErro = "caracter Invalido em string : ' " + characterInvalidoBuffer + " '";
+                                        errorIndicator = true;
                                     }
                                 }else{
                                     classificador = Classificador.STRING;
@@ -448,6 +456,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                 }
                             }else{
                                 msgErro = ("String invalida!");
+                                errorIndicator = true;
                             }
                         }else if (firstASC==39){// '
                             if (token.length()==3){
@@ -468,19 +477,23 @@ public class NewJFrame extends javax.swing.JFrame {
                                     }
                                     if (characterInvalido){
                                         msgErro = "caracter Invalido em char : ' " + characterInvalidoBuffer + " '";
+                                        errorIndicator = true;
                                     }else{
                                         classificador = Classificador.VCHAR;
                                         valor = token.charAt(1);
                                     }
                                 }else{
                                     msgErro = ("char invalido(não termina com ')");
+                                    errorIndicator = true;
                                 }
                             }else{
                                 int ultimoToken = (int)token.charAt(token.length()-1);
                                 if (ultimoToken==39){
                                     msgErro = "char invalido!(tamanho maior que 1)";
+                                    errorIndicator = true;
                                 }else{
                                     msgErro = "' não foi fechado";
+                                    errorIndicator = true;
                                 }
                             }
                         }else if (firstASC>=48&&firstASC<=57){
@@ -513,10 +526,12 @@ public class NewJFrame extends javax.swing.JFrame {
                             }
                             if (erro){
                                 msgErro = errorMsg;
+                                errorIndicator = true;
                             }else{
                                 char ultimoChar = token.charAt(token.length()-1);
                                 if (ultimoChar=='.'){
                                     msgErro = "Número não pode terminar em '.'";
+                                    errorIndicator = true;
                                 }else{
                                     if (encontrouPonto){
                                         classificador = Classificador.VDOUBLE;
@@ -526,6 +541,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                             e.printStackTrace();
                                             classificador = Classificador.ERRO;
                                             msgErro = ("Erro conversão double?");
+                                            errorIndicator = true;
                                         }
                                     }else{
                                         classificador = Classificador.VINTEIRO;
@@ -535,6 +551,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                             e.printStackTrace();
                                             classificador = Classificador.ERRO;
                                             msgErro = ("Erro conversão inteiro?");
+                                            errorIndicator = true;
                                         }
                                     }
                                 }
@@ -572,10 +589,12 @@ public class NewJFrame extends javax.swing.JFrame {
                                 }
                                 if (erro){
                                     msgErro = errorMsg;
+                                    errorIndicator = true;
                                 }else{
                                     char ultimoChar = token.charAt(token.length()-1);
                                     if (ultimoChar=='.'){
                                         msgErro = "Número não pode terminar em '.'";
+                                        errorIndicator = true;
                                     }else{
                                         if (encontrouPonto){
                                             classificador = Classificador.VDOUBLE;
@@ -585,6 +604,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                                 e.printStackTrace();
                                                 classificador = Classificador.ERRO;
                                                 msgErro = ("Erro conversão double?");
+                                                errorIndicator = true;
                                             }
                                         }else{
                                             classificador = Classificador.VINTEIRO;
@@ -594,12 +614,14 @@ public class NewJFrame extends javax.swing.JFrame {
                                                 e.printStackTrace();
                                                 classificador = Classificador.ERRO;
                                                 msgErro = ("Erro conversão inteiro?");
+                                                errorIndicator = true;
                                             }
                                         }
                                     }
                                 }
                             }else{
                                 msgErro = ("Erro de representação de número começando com '+/-' seguido de '.',use um NUMERO depois de '+/-', Ex : +0.5 -1.7");
+                                errorIndicator = true;
                             }
                         }else{
                             //NOME
@@ -663,6 +685,7 @@ public class NewJFrame extends javax.swing.JFrame {
                                         break;
                                 }
                                 msgErro = errorMsg;
+                                errorIndicator = true;
                             }
                         }
                         break;
@@ -677,6 +700,10 @@ public class NewJFrame extends javax.swing.JFrame {
                 System.out.println("token id : " + i + " -> " + tokens.get(i).printSignificado());
             }
             bufferedReader.close();
+            if (errorIndicator==false){
+                SintaticoExec sintatico = new SintaticoExec(tokens);
+                sintatico.processarCadeia();
+            }
         }catch(Exception e){
             e.printStackTrace();
         }

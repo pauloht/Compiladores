@@ -33,6 +33,10 @@ public enum Classificador {
     START,
     IF,
     ELSE,
+    NAOTERMINAL,
+    FIMDELEITURA,
+    VIRGULA,
+    PRINT,
     ERRO;
     
     public String significado(){
@@ -85,6 +89,14 @@ public enum Classificador {
                 return("Tipo");
             case START :
                 return("Palavra reservada 'start'");
+            case NAOTERMINAL : 
+                return("Não terminal");
+            case FIMDELEITURA :
+                return("$");
+            case PRINT :
+                return("print");
+            case VIRGULA :
+                return(",");
             default :
                 return("DEFAULT");
         }

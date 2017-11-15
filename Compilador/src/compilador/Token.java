@@ -22,6 +22,14 @@ public class Token {
         this.classe = classe;
         this.valor = valor;
     }
+
+    public Classificador getClasse() {
+        return classe;
+    }
+
+    public Object getValor() {
+        return valor;
+    }
     
     public String printSignificado(){
         String resp = classe.significado();
