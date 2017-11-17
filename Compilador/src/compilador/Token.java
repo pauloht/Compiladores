@@ -13,6 +13,7 @@ public class Token {
     private Classificador classe = null;
     private Object valor = null;
     String erroMsg;
+    private Integer linha = null;
     
     public Token(Classificador classe){
         this.classe = classe;
@@ -30,9 +31,18 @@ public class Token {
     public Object getValor() {
         return valor;
     }
+
+    public void setLinha(Integer linha) {
+        this.linha = linha;
+    }
+
+    public Integer getLinha() {
+        return linha;
+    }
     
     public String printSignificado(){
-        String resp = classe.significado();
+        String linhaS = "Em linha : " + Integer.toString(linha) + ", ";
+        String resp = linhaS + classe.significado();
         if (classe == Classificador.ERRO){
             resp = "Erro em token : " + valor + ",erro : "+erroMsg;
         }else{

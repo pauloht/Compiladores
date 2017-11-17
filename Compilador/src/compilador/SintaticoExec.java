@@ -22,6 +22,7 @@ public class SintaticoExec {
     Token tokenIp;
     StringBuilder saida;
     int ip = 0;
+    int linhaContador = 0;
     
     public SintaticoExec(ArrayList tokens){
         entrada = tokens;
@@ -176,12 +177,14 @@ public class SintaticoExec {
         }
         pilha.add(new Token(Classificador.FECHAPARENTESES,")"));
         pilha.add(new Token(Classificador.NAOTERMINAL,"<expAritm1>"));
+        pilha.add(new Token(Classificador.ATRIBUICAO,"="));
+        pilha.add(new Token(Classificador.ID,"id"));
         pilha.add(new Token(Classificador.PONTOVIRGULA,";"));
         pilha.add(new Token(Classificador.NAOTERMINAL,"<expRelacional1>"));
         pilha.add(new Token(Classificador.PONTOVIRGULA,";"));
         pilha.add(new Token(Classificador.NAOTERMINAL,"<atribuicao1>"));
         pilha.add(new Token(Classificador.ABREPARENTESES,"("));
-        System.out.println("<expfor> -> = ( <atribuicao1> ; <expRelacional1> ; <expAritm1> )");
+        System.out.println("<expfor> -> = ( <atribuicao1> ; <expRelacional1> ; id = <expAritm1> )");
     }
     
     private void ntAtribuicao1(){
@@ -213,7 +216,7 @@ public class SintaticoExec {
     
     private void ntAtribuicao3(){
         if (tokenIp.getClasse()!=Classificador.OP_ARITMETICA && tokenIp.getClasse()!=Classificador.PONTOVIRGULA){
-            throw new IllegalArgumentException("Esperava-se id ou '(' ou um valor inteiro,pf,char ou booleano, recebeu "+tokenIp.printSignificado());
+            throw new IllegalArgumentException("Esperava-se um operador aritmetico ou ';' , recebeu "+tokenIp.printSignificado());
         }
         if(tokenIp.getClasse()==Classificador.OP_ARITMETICA){
             pilha.add(new Token(Classificador.NAOTERMINAL,"<expAritm2>"));
@@ -224,12 +227,19 @@ public class SintaticoExec {
     }
     
     private void ntBool1(){
-        if (tokenIp.getClasse()!=Classificador.ABREPARENTESES){
-            throw new IllegalArgumentException("Esperava-se ')', recebeu "+tokenIp.printSignificado());
+        if (tokenIp.getClasse()!=Classificador.ABREPARENTESES && tokenIp.getClasse()!=Classificador.NEGACAO){
+            throw new IllegalArgumentException("Esperava-se '!!' ou ')', recebeu "+tokenIp.printSignificado());
         }
-        pilha.add(new Token(Classificador.NAOTERMINAL,"<expBool2>"));
-        pilha.add(new Token(Classificador.ABREPARENTESES,"("));
-        System.out.println("<expBool1> -> ( <expBool2> ");
+        if (tokenIp.getClasse()==Classificador.ABREPARENTESES){
+            pilha.add(new Token(Classificador.NAOTERMINAL,"<expBool2>"));
+            pilha.add(new Token(Classificador.ABREPARENTESES,"("));
+            System.out.println("<expBool1> -> ( <expBool2> ");
+        }else{
+            pilha.add(new Token(Classificador.NAOTERMINAL,"<expBool2>"));
+            pilha.add(new Token(Classificador.ABREPARENTESES,"("));
+            pilha.add(new Token(Classificador.NEGACAO,"!!"));
+            System.out.println("<expBool1> -> !!( <expBool2> ");
+        }
     }
     
     private void ntBool2(){
@@ -254,28 +264,13 @@ public class SintaticoExec {
             throw new IllegalArgumentException("Esperava-se ')' ou um operador booleano, recebeu "+tokenIp.printSignificado());
         }
         if (tokenIp.getClasse()==Classificador.OP_BOOLEAN_DUAL){
-            pilha.add(new Token(Classificador.FECHAPARENTESES,")"));
-            pilha.add(new Token(Classificador.NAOTERMINAL,"<expBool4>"));
+            pilha.add(new Token(Classificador.NAOTERMINAL,"<expBool3>"));
             pilha.add(new Token(Classificador.NAOTERMINAL,"<expRelacional1>"));
             pilha.add(new Token(Classificador.OP_BOOLEAN_DUAL,"opBool"));
-            System.out.println("<expBool3> -> opBooleano  <expRelacional1> <expBool4>)");
+            System.out.println("<expBool3> -> opBooleano  <expRelacional1> <expBool3>");
         }else{
             pilha.add(new Token(Classificador.FECHAPARENTESES,")"));
             System.out.println("<expBool3> -> )");
-        }
-    }
-    
-    private void ntBool4(){
-        if (tokenIp.getClasse()!=Classificador.OP_BOOLEAN_DUAL && tokenIp.getClasse()!=Classificador.FECHAPARENTESES){
-            throw new IllegalArgumentException("Esperava-se ')' ou um operador booleano, recebeu "+tokenIp.printSignificado());
-        }
-        if (tokenIp.getClasse()==Classificador.OP_BOOLEAN_DUAL){
-            pilha.add(new Token(Classificador.NAOTERMINAL,"<expBool4>"));
-            pilha.add(new Token(Classificador.NAOTERMINAL,"<expRelacional1>"));
-            pilha.add(new Token(Classificador.OP_BOOLEAN_DUAL,"opBool"));
-            System.out.println("<expBool4> -> opBooleano  <expRelacional1> <expBool4>)");
-        }else{
-            System.out.println("<expBool4> -> #");
         }
     }
     
@@ -349,7 +344,7 @@ public class SintaticoExec {
     }
     
     private void ntAritmetica2(){
-        if (tokenIp.getClasse()!=Classificador.OP_ARITMETICA && tokenIp.getClasse()!=Classificador.FECHAPARENTESES && tokenIp.getClasse()!=Classificador.PONTOVIRGULA){
+        if (tokenIp.getClasse()!=Classificador.OP_ARITMETICA && tokenIp.getClasse()!=Classificador.FECHAPARENTESES && tokenIp.getClasse()!=Classificador.ABREPARENTESES && tokenIp.getClasse()!=Classificador.PONTOVIRGULA){
             throw new IllegalArgumentException("Esperava-se um operacao aritmetica ou '(' ou ';', recebeu "+tokenIp.printSignificado());
         }
         if (tokenIp.getClasse()==Classificador.OP_ARITMETICA){
@@ -441,9 +436,6 @@ public class SintaticoExec {
             case "<expBool3>" :
                 ntBool3();
                 break;
-            case "<expBool4>" :
-                ntBool4();
-                break;
             case "<expAritm1>" :
                 ntAritmetica1();
                 break;
@@ -477,16 +469,18 @@ public class SintaticoExec {
                     System.out.println("fim");
                     if (pilha.empty() && ip>=entrada.size()){
                         System.out.println("Gramatica aprovada!");
-                        System.out.println("saida : " + saida);
+                        System.out.println("Saida : " + saida);
                     }else{
                         System.out.println("Gramatica incorreta!");
                         if (pilha.empty()==false){
-                            System.out.println("talvez você esqueceu '"+ ((String)pilha.pop().getValor()) + "'");
+                            System.out.println("Talvez você esqueceu '"+ ((String)pilha.pop().getValor()) + "' em linha " + linhaContador);
+                        }else{
+                            System.out.println("Existem codigo fora de int start(){ }!");
                         }
                     }
                     break;
                 }else{
-                    // /*
+                      /*
                         Object[] tempArray = pilha.toArray();
                         StringBuilder tempPilha = new StringBuilder("| ");
                         for (int i=0;i<tempArray.length;i++){
@@ -497,6 +491,7 @@ public class SintaticoExec {
                     // */
                     
                     tokenIp = entrada.get(ip);
+                    linhaContador = tokenIp.getLinha();
                     Token topoPilha = pilha.pop();
                     //System.out.println("ip : " + tokenIp.printSignificado());
                     //System.out.println("topoPilha : " + topoPilha.printSignificado());
@@ -518,7 +513,11 @@ public class SintaticoExec {
                             saida.append(" | ");
                             ip++;
                         }else{
-                            throw new IllegalArgumentException("Erro : pilha e entrada diferenciando, talvez você esqueceu '"+ ((String)topoPilha.getValor()) + "'");
+                            Object valor = tokenIp.getValor();
+                            if (valor==null){
+                                valor = tokenIp.getClasse().significado();
+                            }
+                            throw new IllegalArgumentException("Pilha e entrada diferenciando, talvez você esqueceu '"+ ((String)topoPilha.getValor()) + "' no lugar de '" +  (String)valor + "' em linha " + linhaContador);
                         }
                     }
                 }
@@ -531,7 +530,7 @@ public class SintaticoExec {
                 */
             }
         }catch(IllegalArgumentException e){
-            e.printStackTrace();
+            //e.printStackTrace();
             System.out.println("Gramatica incorreta!");
             System.out.println("Erro : " + e.getMessage());
         }
